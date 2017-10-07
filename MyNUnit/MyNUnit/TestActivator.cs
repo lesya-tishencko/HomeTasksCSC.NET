@@ -9,7 +9,7 @@ namespace MyNUnit
 {
     public class TestActivator
     {
-        private Assembly[] assemblies;
+        internal Assembly[] assemblies;
 
         public TestActivator(string path) 
         {
