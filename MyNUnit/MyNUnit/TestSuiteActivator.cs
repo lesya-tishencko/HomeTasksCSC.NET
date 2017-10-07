@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("MyNUnitTests")]
 namespace MyNUnit
 {
     public class TestSuiteActivator
     {
         private Type type;
-        private object obj;
+        internal object obj;
         private List<MethodInfo> testMethods = new List<MethodInfo>();
-        private List<MethodInfo> beforeClassMethods = new List<MethodInfo>();
-        private List<MethodInfo> afterClassMethods = new List<MethodInfo>();
+        internal List<MethodInfo> beforeClassMethods = new List<MethodInfo>();
+        internal List<MethodInfo> afterClassMethods = new List<MethodInfo>();
         private List<MethodInfo> beforeMethods = new List<MethodInfo>();
         private List<MethodInfo> afterMethods = new List<MethodInfo>();
         private static Stopwatch stopWatch = new Stopwatch();
@@ -25,12 +27,7 @@ namespace MyNUnit
             {
                 obj = ctor.Invoke(null);
             }
-        }
-
-        public string[] RunTests()
-        {
-            var methods = type.GetMethods();
-            foreach (var methInfo in methods)
+            foreach (var methInfo in type.GetMethods())
             {
                 if (IsTestMethod(methInfo)) testMethods.Add(methInfo);
                 else if (IsBeforeClassMethod(methInfo)) beforeClassMethods.Add(methInfo);
@@ -38,7 +35,10 @@ namespace MyNUnit
                 else if (IsBeforeMethod(methInfo)) beforeMethods.Add(methInfo);
                 else if (IsAfterMethod(methInfo)) afterMethods.Add(methInfo);
             }
+        }
 
+        public string[] RunTests()
+        {
             try
             {
                 beforeClassMethods.ForEach(method => method.Invoke(obj, null));
@@ -48,11 +48,11 @@ namespace MyNUnit
             }
             catch (Exception exc)
             {
-                return new string[]{ $"Test suit: {type.Name} methods throws unhandled exception: {exc.InnerException.Message}" };
+                return new string[]{ $"Test suit: {type.Name} throws unhandled exception: {exc.InnerException.Message}" };
             }
         }
 
-        private string RunTestMethod(MethodInfo test)
+        internal string RunTestMethod(MethodInfo test)
         {
             string status;
             try
@@ -90,7 +90,7 @@ namespace MyNUnit
             {
                 if (expectedException != null && exc.InnerException.GetType() == expectedException)
                 {
-                    status = "Success: Test " + test.DeclaringType.FullName + "." + test.Name + " crashed with expected exception: " + expectedException.ToString();
+                    status = "Success: Test " + type.Name + "." + test.Name + " crashed with expected exception: " + expectedException.ToString();
                 }
                 else
                 {
