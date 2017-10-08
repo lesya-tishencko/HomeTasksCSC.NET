@@ -1,82 +1,93 @@
-﻿namespace Trie
+﻿using System.Collections.Generic;
+
+namespace Trie
 {
-    public class Trie
+    public class Trie : ITrie
     {
         public bool Add(string element)
         {
-            if (element == "") return false;
-
-            Vertex curr = root;
-            bool notAdded = false;
-            foreach (char ch in element.ToCharArray())
+            if (element == "")
             {
-                if (curr.next[ch] == null)
-                {
-                    notAdded = true;
-                    break;
-                }
-                curr = curr.next[ch];
+                return false;
             }
-            if (!notAdded && curr.terminal) return false;
 
-            curr = root;
-            foreach (char ch in element.ToCharArray())
+            var isAdded = Contains(element);
+            if (!isAdded)
             {
-                if (curr.next[ch] == null)
+                var curr = _root;
+                foreach (char ch in element)
                 {
-                    curr.next[ch] = new Vertex();
+                    if (!curr.next.ContainsKey(ch))
+                    {
+                        curr.next.Add(ch, new Vertex());
+                    }
+                    ++curr.postfixCount;
+                    curr = curr.next[ch];
                 }
-                curr.postfixCount++;
-                curr = curr.next[ch];
+                ++curr.postfixCount;
+                curr.isTerminal = true;
             }
-            curr.postfixCount++;
-            curr.terminal = true;
-            return true;
+            return !isAdded;
         }
 
         public bool Contains(string element)
         {
-            if (element == "") return false;
-
-            Vertex curr = root;
-            foreach (char ch in element.ToCharArray())
+            if (element == "")
             {
-                if (curr.next[ch] == null) return false;
+                return false;
+            }
+
+            var curr = _root;
+            foreach (char ch in element)
+            {
+                if (!curr.next.ContainsKey(ch))
+                {
+                    return false;
+                }
                 curr = curr.next[ch];
             }
-            return curr.terminal;
+            return curr.isTerminal;
         }
 
         public bool Remove(string element)
         {
-            if (!Contains(element)) return false;
-
-            Vertex curr = root;
-            curr.postfixCount--;
-            foreach (char ch in element.ToCharArray())
+            if (!Contains(element))
             {
-                curr.next[ch].postfixCount--;
+                return false;
+            }
+
+            var curr = _root;
+            --curr.postfixCount;
+            foreach (char ch in element)
+            {
+                --curr.next[ch].postfixCount;
                 if (curr.next[ch].postfixCount == 0)
                 {
-                    curr.next[ch] = null;
+                    curr.next.Remove(ch);
                     return true;
                 }
                 curr = curr.next[ch];
             }
-            curr.terminal = false;
+            curr.isTerminal = false;
             return true;
         }
 
-        public int Size() => root.postfixCount;
+        public int Size() => _root.postfixCount;
 
         public int HowManyStartsWithPrefix(string prefix)
         {
-            if (prefix == "") return Size();
-
-            Vertex curr = root;
-            foreach (char ch in prefix.ToCharArray())
+            if (prefix == "")
             {
-                if (curr.next[ch] == null) return 0;
+                return Size();
+            }
+
+            var curr = _root;
+            foreach (char ch in prefix)
+            {
+                if (!curr.next.ContainsKey(ch))
+                {
+                    return 0;
+                }
                 curr = curr.next[ch];
             }
             return curr.postfixCount;
@@ -84,12 +95,11 @@
 
         private class Vertex
         {
-            public Vertex[] next = new Vertex[upperBoundTableSize];
+            public Dictionary<char, Vertex> next = new Dictionary<char, Vertex>();
             public int postfixCount;
-            public bool terminal;
+            public bool isTerminal;
         }
-
-        private const int upperBoundTableSize = 256;
-        private Vertex root = new Vertex();
+        
+        private Vertex _root = new Vertex();
     }
 }

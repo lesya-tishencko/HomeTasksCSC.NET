@@ -1,125 +1,105 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Trie;
+using System.Collections.Generic;
 
 namespace Trie.Tests
 {
     [TestClass()]
-    public class TrieTests
+    public class TestTrie
     {
-        [TestMethod()]
-        public void AddTest()
+        private ITrie _trie;
+        private List<string>[] _sourceLists = { new List<string> { "He", "She", "His", "Her", "They", "Their" } };
+
+
+        [TestInitialize()]
+        public void Initialize()
         {
-            var trie = new Trie();
-            Assert.IsTrue(trie.Add("He"));
-            Assert.IsTrue(trie.Add("She"));
-            Assert.IsTrue(trie.Add("His"));
-            Assert.IsTrue(trie.Add("Her"));
-            Assert.IsFalse(trie.Add("He"));
-            Assert.IsFalse(trie.Add(""));
-            Assert.IsTrue(trie.Add("They"));
-            Assert.IsFalse(trie.Add("They"));
-            Assert.IsTrue(trie.Add("Their"));
+            _trie = new Trie();
         }
 
         [TestMethod()]
-        public void ContainsTest()
+        public void TestAdd()
         {
-            var trie = new Trie();
-            trie.Add("He");
-            trie.Add("She");
-            trie.Add("His");
-            trie.Add("Her");
-            trie.Add("They");
-            trie.Add("Their");
-
-            Assert.IsTrue(trie.Contains("He"));
-            Assert.IsTrue(trie.Contains("She"));
-            Assert.IsTrue(trie.Contains("His"));
-            Assert.IsTrue(trie.Contains("Her"));
-            Assert.IsFalse(trie.Contains("Here"));
-            Assert.IsFalse(trie.Contains("H!s"));
-            Assert.IsTrue(trie.Contains("They"));
-            Assert.IsTrue(trie.Contains("Their"));
-
-            trie.Remove("He");
-            trie.Remove("They");
-            trie.Remove("He");
-            trie.Remove("Her");
-
-            Assert.IsFalse(trie.Contains("He"));
-            Assert.IsTrue(trie.Contains("She"));
-            Assert.IsTrue(trie.Contains("His"));
-            Assert.IsFalse(trie.Contains("Her"));
-            Assert.IsFalse(trie.Contains("They"));
-            Assert.IsTrue(trie.Contains("Their"));
+            _sourceLists[0].ForEach(elem => Assert.IsTrue(_trie.Add(elem)));
+            Assert.IsFalse(_trie.Add("He"));
+            Assert.IsFalse(_trie.Add(""));
+            Assert.IsFalse(_trie.Add("They"));
         }
 
         [TestMethod()]
-        public void RemoveTest()
+        public void TestContains()
         {
-            var trie = new Trie();
-            trie.Add("He");
-            trie.Add("She");
-            trie.Add("His");
-            trie.Add("Her");
-            trie.Add("Her");
-            trie.Add("They");
-            trie.Add("Their");
+            _sourceLists[0].ForEach(elem => _trie.Add(elem));
+            _sourceLists[0].ForEach(elem => Assert.IsTrue(_trie.Contains(elem)));
 
-            Assert.IsTrue(trie.Remove("He"));
-            Assert.IsFalse(trie.Remove("He"));
-            Assert.IsFalse(trie.Remove("H!s"));
-            Assert.IsTrue(trie.Remove("They"));
+            Assert.IsFalse(_trie.Contains("Here"));
+            Assert.IsFalse(_trie.Contains("H!s"));
+
+            _trie.Remove("He");
+            _trie.Remove("They");
+            _trie.Remove("He");
+            _trie.Remove("Her");
+
+            Assert.IsFalse(_trie.Contains("He"));
+            Assert.IsTrue(_trie.Contains("She"));
+            Assert.IsTrue(_trie.Contains("His"));
+            Assert.IsFalse(_trie.Contains("Her"));
+            Assert.IsFalse(_trie.Contains("They"));
+            Assert.IsTrue(_trie.Contains("Their"));
         }
 
         [TestMethod()]
-        public void SizeTest()
+        public void TestRemove()
         {
-            var trie = new Trie();
-            trie.Add("He");
-            trie.Add("She");
-            trie.Add("His");
-            trie.Add("Her");
-            trie.Add("Her");
-            trie.Add("They");
-            trie.Add("Their");
+            _sourceLists[0].ForEach(elem => _trie.Add(elem));
 
-            Assert.AreEqual(6, trie.Size());
-
-            trie.Remove("He");
-            trie.Remove("They");
-            trie.Remove("He");
-
-            Assert.AreEqual(4, trie.Size());
+            Assert.IsTrue(_trie.Remove("He"));
+            Assert.IsFalse(_trie.Remove("He"));
+            Assert.IsFalse(_trie.Remove("H!s"));
+            Assert.IsTrue(_trie.Remove("They"));
         }
 
         [TestMethod()]
-        public void HowManyStartsWithPrefixTest()
+        public void TestSize()
         {
-            var trie = new Trie();
-            trie.Add("He");
-            trie.Add("Her");
-            trie.Add("She");
-            trie.Add("His");
-            trie.Add("They");
-            trie.Add("Their");
+            _sourceLists[0].ForEach(elem => _trie.Add(elem));
 
-            Assert.AreEqual(2, trie.HowManyStartsWithPrefix("He"));
-            Assert.AreEqual(3, trie.HowManyStartsWithPrefix("H"));
-            Assert.AreEqual(2, trie.HowManyStartsWithPrefix("The"));
+            Assert.AreEqual(6, _trie.Size());
 
-            trie.Remove("He");
-            trie.Remove("They");
-            trie.Remove("Her");
+            _trie.Remove("He");
+            _trie.Remove("They");
 
-            Assert.AreEqual(0, trie.HowManyStartsWithPrefix("He"));
-            Assert.AreEqual(1, trie.HowManyStartsWithPrefix("The"));
-            Assert.AreEqual(1, trie.HowManyStartsWithPrefix("H"));
+            Assert.AreEqual(4, _trie.Size());
+        }
 
-            trie.Add("Here");
-            trie.Add("Her");
+        [TestMethod()]
+        public void TestHowManyStartsWithPrefix()
+        {
+            _sourceLists[0].ForEach(elem => _trie.Add(elem));
 
-            Assert.AreEqual(2, trie.HowManyStartsWithPrefix("Her"));
+            Assert.AreEqual(2, _trie.HowManyStartsWithPrefix("He"));
+            Assert.AreEqual(3, _trie.HowManyStartsWithPrefix("H"));
+            Assert.AreEqual(2, _trie.HowManyStartsWithPrefix("The"));
+
+            _trie.Remove("He");
+            _trie.Remove("They");
+            _trie.Remove("Her");
+
+            Assert.AreEqual(0, _trie.HowManyStartsWithPrefix("He"));
+            Assert.AreEqual(1, _trie.HowManyStartsWithPrefix("The"));
+            Assert.AreEqual(1, _trie.HowManyStartsWithPrefix("H"));
+
+            _trie.Add("Here");
+            _trie.Add("Her");
+
+            Assert.AreEqual(2, _trie.HowManyStartsWithPrefix("Her"));
+        }
+
+        [TestMethod()]
+        public void TestIndexOutOfRangeException()
+        {
+            Assert.IsTrue(_trie.Add("Привет!"));
+            Assert.IsTrue(_trie.Add("Пока!"));
+            Assert.IsTrue(_trie.Remove("Привет!"));
         }
     }
 }
