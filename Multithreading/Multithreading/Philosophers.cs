@@ -3,6 +3,9 @@ using System.Threading;
 
 namespace Multithreading
 {
+    /// <summary>
+    /// Based on algorithm dinning philosophers from Tanenbaum's Modern Operating System
+    /// </summary>
     public class Philosophers
     {
         private const int countOfPhilosophers = 5;
