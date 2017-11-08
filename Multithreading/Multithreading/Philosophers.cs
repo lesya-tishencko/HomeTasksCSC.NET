@@ -27,14 +27,11 @@ namespace Multithreading
                 states[i] = State.Thinking;
             }
             randomizer = new Random();
-         }
-
-        private int leftNeibor(int index) => (index + countOfPhilosophers - 1) % countOfPhilosophers;
-        private int rightNeibor(int index) => (index + 1) % countOfPhilosophers;
+        }
 
         public void Philosopher(object index)
         {
-            while(true)
+            while (true)
             {
                 Think((int)index);
                 TakeForks((int)index);
@@ -42,6 +39,9 @@ namespace Multithreading
                 PutForks((int)index);
             }
         }
+
+        private int leftNeibor(int index) => (index + countOfPhilosophers - 1) % countOfPhilosophers;
+        private int rightNeibor(int index) => (index + 1) % countOfPhilosophers;
 
         private void PutForks(int index)
         {

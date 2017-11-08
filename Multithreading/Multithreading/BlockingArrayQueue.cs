@@ -8,12 +8,10 @@ namespace Multithreading
         private int size;
         private int head;
         private int tail;
-        private AutoResetEvent waitHandle;
 
         public BlockingArrayQueue(int capacity = 256)
         {
             array = new T[capacity];
-            waitHandle = new AutoResetEvent(false);
         }
 
         public bool TryEnqueue(T item)
@@ -38,6 +36,7 @@ namespace Multithreading
                 if (size == 0)
                 {
                     result = default(T);
+                    return false;
                 }
                 result = array[head];
                 array[head] = default(T);
@@ -72,6 +71,7 @@ namespace Multithreading
                 if (size != 0)
                 {
                     size = 0;
+                    head = 0;
                     head = tail;
                 }
             }
