@@ -60,6 +60,14 @@
       <Project>{3055D587-A571-4539-A53C-5834B55CD1A1}</Project>
       <Name>MyNUnit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NUnitTest\NUnitTest.csproj">
+      <Project>{d19e50e6-f1fa-4b34-999c-017f4fa093c3}</Project>
+      <Name>NUnitTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NUnit\NUnit.csproj">
+      <Project>{28055b34-6b9e-4818-bd5d-2f49ef5d71ca}</Project>
+      <Name>NUnit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

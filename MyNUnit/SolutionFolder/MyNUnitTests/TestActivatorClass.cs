@@ -2,27 +2,25 @@
 
 namespace MyNUnit.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class TestActivatorClass
     {
-        [TestMethod()]
+        [TestMethod]
         public void TestAssembliesPath()
         {
-            var testHandler = new TestActivator(@"../../..");
-            Assert.AreEqual(13, testHandler.assemblies.Length);
-
-            testHandler = new TestActivator(@"../../../NUnit/bin/Debug");
+            var testHandler = new TestActivator(@"../../../NUnit/bin/Debug");
             Assert.AreEqual(1, testHandler.assemblies.Length);
 
             testHandler = new TestActivator(@"../../../NUnitTest/bin/Debug");
             Assert.AreEqual(2, testHandler.assemblies.Length);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void TestRunningWithoutException()
         {
             var testHandler = new TestActivator(@"../../..");
             testHandler.LoadTests();
+            Assert.IsTrue(testHandler.assemblies.Length > 0);
         }
     }
 }
