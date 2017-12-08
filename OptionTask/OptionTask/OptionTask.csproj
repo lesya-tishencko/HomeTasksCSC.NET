@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="Option.cs" />
     <Compile Include="OptionException.cs" />
-    <Compile Include="OptionImpl.cs" />
+    <Compile Include="OptionTemplated.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
