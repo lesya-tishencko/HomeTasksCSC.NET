@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -11,14 +10,14 @@ namespace MyNUnit
 {
     public class TestSuiteActivator
     {
-        private Type type;
-        internal object obj;
-        private List<MethodInfo> testMethods = new List<MethodInfo>();
-        internal List<MethodInfo> beforeClassMethods = new List<MethodInfo>();
-        internal List<MethodInfo> afterClassMethods = new List<MethodInfo>();
-        private List<MethodInfo> beforeMethods = new List<MethodInfo>();
-        private List<MethodInfo> afterMethods = new List<MethodInfo>();
-        private static Stopwatch stopWatch = new Stopwatch();
+        private readonly Type type;
+        internal readonly object obj;
+        private readonly List<MethodInfo> testMethods = new List<MethodInfo>();
+        internal readonly List<MethodInfo> beforeClassMethods = new List<MethodInfo>();
+        internal readonly List<MethodInfo> afterClassMethods = new List<MethodInfo>();
+        private readonly List<MethodInfo> beforeMethods = new List<MethodInfo>();
+        private readonly List<MethodInfo> afterMethods = new List<MethodInfo>();
+        private readonly static Stopwatch stopWatch = new Stopwatch();
 
         public TestSuiteActivator(Type type)
         {
@@ -29,7 +28,7 @@ namespace MyNUnit
                 obj = ctor.Invoke(null);
             }
 
-            foreach (var methInfo in type.GetMethods().Where(meth => !meth.IsSecurityCritical))
+            foreach (var methInfo in type.GetMethods())
             {
                 var attributes = CustomAttributeData.GetCustomAttributes(methInfo);
 
@@ -45,14 +44,14 @@ namespace MyNUnit
         {
             try
             {
-                beforeClassMethods.ToObservable().Subscribe(method => method.Invoke(obj, null));
+                foreach (var method in beforeClassMethods) method.Invoke(obj, null);
                 var result = testMethods.Select(RunTestMethod).ToArray();
-                afterClassMethods.ToObservable().Subscribe(method => method.Invoke(obj, null));
+                foreach (var method in afterClassMethods) method.Invoke(obj, null);
                 return result;
             }
             catch (Exception exc)
             {
-                return new[] { $"Test suit: {type.Name} throws unhandled exception: {exc.InnerException?.Message}" };
+                return new []{ $"Test suit: {type.Name} throws unhandled exception: {exc.InnerException?.Message}" };
             }
         }
 
@@ -61,7 +60,7 @@ namespace MyNUnit
             string status;
             try
             {
-                beforeMethods.ToObservable().Subscribe(method => method.Invoke(obj, null));
+                foreach (var method in beforeMethods) method.Invoke(obj, null);
             }
             catch (Exception exc)
             {
@@ -118,7 +117,7 @@ namespace MyNUnit
 
             try
             {
-                afterMethods.ToObservable().Subscribe(method => method.Invoke(obj, null));
+                foreach (var method in afterMethods) method.Invoke(obj, null);
             }
             catch (Exception exc)
             {
