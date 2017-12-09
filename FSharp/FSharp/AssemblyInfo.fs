@@ -1,7 +1,6 @@
 ﻿namespace FSharp.AssemblyInfo
 
 open System.Reflection
-open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
 // Общие сведения о сборке можно задать с помощью следующего 
