@@ -52,7 +52,7 @@
         let expressionTree = Add(Mul(Num 1, Sub(Var "a", Var "b")), Div(Num 24, Num 8))
         eval environment expressionTree // 7
 
-    let factor n = seq{for m in 2..(n |> float|> sqrt |> int) do if n % 2 = 1 && n % m = 0 then yield m}
+    let factor n = seq{for m in 2..(n |> float |> sqrt |> int) do if n % 2 = 1 && n % m = 0 then yield m}
     let isPrime n = (factor n |> Seq.toList) = [1]
     let primes =  Seq.filter isPrime <| Seq.initInfinite (fun x -> x + 2)
 
