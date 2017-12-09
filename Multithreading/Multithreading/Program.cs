@@ -9,7 +9,7 @@ namespace Multithreading
             var philosophers = new Philosophers();
             for (int i = 0; i < 5; i++)
             {
-                Thread thread = new Thread(new ParameterizedThreadStart(philosophers.Philosopher));
+                Thread thread = new Thread(philosophers.Philosopher);
                 thread.Start(i);
             }
         }

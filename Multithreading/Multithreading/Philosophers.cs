@@ -8,25 +8,19 @@ namespace Multithreading
     /// </summary>
     public class Philosophers
     {
-        private const int countOfPhilosophers = 5;
-        private const int maxWaitingTime = 100;
-        private enum State { Thinking, Hungry, Eating };
-        private State[] states;
-        private Semaphore mutex;
-        private Semaphore[] semaphores;
-        private Random randomizer;
+        private const int CountOfPhilosophers = 5;
+        private const int MaxWaitingTime = 100;
+        private readonly Fork[] _forks;
+        private readonly Random _randomizer;
 
         public Philosophers()
         {
-            mutex = new Semaphore(1, 5);
-            semaphores = new Semaphore[countOfPhilosophers];
-            states = new State[countOfPhilosophers];
-            for (int i = 0; i < countOfPhilosophers; i++)
+            _forks = new Fork[CountOfPhilosophers];
+            for (var i = 0; i < CountOfPhilosophers; i++)
             {
-                semaphores[i] = new Semaphore(1, 5);
-                states[i] = State.Thinking;
+                _forks[i] = new Fork(i);
             }
-            randomizer = new Random();
+            _randomizer = new Random();
         }
 
         public void Philosopher(object index)
@@ -34,54 +28,28 @@ namespace Multithreading
             while (true)
             {
                 Think((int)index);
-                TakeForks((int)index);
+                while(!_forks[leftFork((int)index)].Take()) { }
+                while (!_forks[rightFork((int)index)].Take()) { }
+
                 Eat((int)index);
-                PutForks((int)index);
+                _forks[leftFork((int)index)].Put();
+                _forks[rightFork((int)index)].Put();
             }
         }
 
-        private int leftNeibor(int index) => (index + countOfPhilosophers - 1) % countOfPhilosophers;
-        private int rightNeibor(int index) => (index + 1) % countOfPhilosophers;
-
-        private void PutForks(int index)
-        {
-            mutex.WaitOne();
-            states[index] = State.Thinking;
-            Test(leftNeibor(index));
-            Test(rightNeibor(index));
-            mutex.Release();
-        }
+        private int leftFork(int index) => index;
+        private int rightFork(int index) => (index + 1) % CountOfPhilosophers;
 
         private void Eat(int index)
         {
             Console.WriteLine("Philosopher {0} is eating", index);
-            Thread.Sleep(randomizer.Next(maxWaitingTime));
-        }
-
-        private void TakeForks(int index)
-        {
-            mutex.WaitOne();
-            states[index] = State.Hungry;
-            Test(index);
-            mutex.Release();
-            semaphores[index].WaitOne();
-        }
-
-        private void Test(int index)
-        {
-            if (states[index] == State.Hungry &&
-                states[leftNeibor(index)] != State.Eating &&
-                states[rightNeibor(index)] != State.Eating)
-            {
-                states[index] = State.Eating;
-                semaphores[index].Release();
-            }
+            Thread.Sleep(_randomizer.Next(MaxWaitingTime));
         }
 
         private void Think(int index)
         {
             Console.WriteLine("Philosopher {0} is thinking", index);
-            Thread.Sleep(randomizer.Next(maxWaitingTime));
+            Thread.Sleep(_randomizer.Next(MaxWaitingTime));
         }
     }
 }
